@@ -25,7 +25,7 @@ const data = {
   },
   teams: [
     {
-      name: "Investing Funding.",
+      name: "Decision Plataform.",
       logo: AudioWaveform,
       plan: "Startup",
     }
@@ -38,12 +38,20 @@ const data = {
       isActive: true,
       items: [
         {
-          title: "Predictions e Backtests",
-          url: "/dashboard/predicts",
+          title: "Candidatos",
+          url: "/dashboard/candidatos",
         },
         {
-          title: "Carteira Factor",
-          url: "/dashboard/factorInvets",
+          title: "Cadastrar Candidato",
+          url: "/dashboard/create-candidato",
+        },
+        {
+          title: "Vagas",
+          url: "/dashboard/vagas",
+        },
+        {
+          title: "Cadastrar Vaga",
+          url: "/dashboard/create-vaga",
         },
       ],
     },

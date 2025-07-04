@@ -12,17 +12,17 @@ export default function Home() {
         </div>
       </header>
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <h1 className="text-4xl font-bold mb-4">B3 Trading</h1>
+        <h1 className="text-4xl font-bold mb-4">Decision Plataforma</h1>
         <p className="text-lg items-center justify-center max-w-[900px] text-gray-600 mb-8">
-          Bem-vindo ao Projeto do Tech Challenge fase 4.
-          Essa plataforma web foi desenvolvida para apresentar os resultados dos modelos deep Learning usados para prever o mercado de Ações brasileira, Abaixo você será redirecionado às páginas do projeto e caso queira saber mais, acesse o link de documentação na sidebar à esquerda da página.
+          Bem-vindo ao Projeto do Datathon.
+          Essa plataforma web foi desenvolvida para apresentar os resultados dos modelos de recomendação e matching de perfis de candidatos a vagas de emprego, esses dados foram capturados e são tratados pela empresa Decision a qual desempenha um papel no fundamental no processo de recrutamento de taletos
         </p>
         <div className="flex gap-4">
           <Button asChild variant={'outline'}>
-            <a href="/dashboard/predicts">Dashboard Backtests</a>
+            <a href="/dashboard/vagas">Dashboard Vagas</a>
           </Button>
           <Button asChild variant="outline">
-            <a href="/dashboard/factorInvets">Dashboard FactorInveting</a>
+            <a href="/dashboard/candidatos">Dashboard Candidatos</a>
           </Button>
         </div>
       </div>
