@@ -32,27 +32,47 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
+      title: "Candidatos",
       url: "#",
       icon: SquareTerminal,
       isActive: true,
       items: [
         {
-          title: "Candidatos",
+          title: "Lista Candidatos",
           url: "/dashboard/candidatos",
         },
         {
           title: "Cadastrar Candidato",
           url: "/dashboard/create-candidato",
-        },
+        }
+      ],
+    },
+    {
+      title: "Vagas",
+      url: "#",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
         {
-          title: "Vagas",
+          title: "Lista Vagas",
           url: "/dashboard/vagas",
         },
         {
           title: "Cadastrar Vaga",
           url: "/dashboard/create-vaga",
         },
+      ],
+    },
+    {
+      title: "Prospects",
+      url: "#",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Analise prospects",
+          url: "/dashboard/prospects",
+        }
       ],
     },
     {

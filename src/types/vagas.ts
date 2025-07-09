@@ -1,3 +1,4 @@
+
 export interface InfosBasicas {
   data_requisicao: string | null;
   requisitante: string;

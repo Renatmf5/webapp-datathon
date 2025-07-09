@@ -9,7 +9,7 @@ import {
   fetchDataCandidatosById,
   buscaVagasParaCandidato,
   analisaMatchEntreCandidatoEVaga
-} from '../../../../../services/api';
+} from '../../../../services/api';
 import { CandidateDataMatching } from '@/types/candidates';
 
 export default function CandidatoDetailsPage() {

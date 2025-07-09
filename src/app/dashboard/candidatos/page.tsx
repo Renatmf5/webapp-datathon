@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchDataCandidatos } from '../../../../services/api';
+import { fetchDataCandidatos } from '../../../services/api';
 import CandidatoCard from '@/components/candidato-card';
 
 // Interfaces para o candidate

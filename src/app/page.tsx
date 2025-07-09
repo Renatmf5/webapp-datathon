@@ -1,6 +1,7 @@
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export default function Home() {
   return (
@@ -19,10 +20,13 @@ export default function Home() {
         </p>
         <div className="flex gap-4">
           <Button asChild variant={'outline'}>
-            <a href="/dashboard/vagas">Dashboard Vagas</a>
+            <Link href="/dashboard/vagas/">Ir para Vagas</Link>
           </Button>
           <Button asChild variant="outline">
-            <a href="/dashboard/candidatos">Dashboard Candidatos</a>
+            <Link href="/dashboard/candidatos/">Ir para Candidatos</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/dashboard/prospects/">Ir para Prospects</Link>
           </Button>
         </div>
       </div>

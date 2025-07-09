@@ -2,7 +2,7 @@ import axios from 'axios';
 import { CandidateDataMatching } from '@/types/candidates';
 import { VagaDetails } from '@/types/vagas';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1/';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.grupo-ever-rmf.com/api/v1/';
 
 console.log('NEXT_PUBLIC_API_BASE_URL:', API_BASE_URL);
 const api = axios.create({
@@ -177,3 +177,39 @@ export const analisaMatchEntreCandidatoEVaga = async (candidatoData: CandidateDa
     throw error;
   }
 };
+
+
+export const fetchDataAnaliseProcessos = async (offset: number, limit: number) => {
+  try {
+    const response = await api.get('prospects/grouped-list', {
+      params: { offset, limit }
+    });
+    console.log('fetchDataAnaliseProcessos API Response:', response.data);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error fetching analise processos:', error.message);
+      console.error('Error details:', error.toJSON());
+    } else {
+      console.error('Unexpected error fetching analise processos:', error);
+    }
+    throw error;
+  }
+};
+
+
+export const atualizaProspect = async (prospectData: unknown) => {
+  try {
+    const response = await api.put('prospects/update-candidate', prospectData);
+    console.log('atualizaProspect API Response:', response.data);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error updating prospect:', error.message);
+      console.error('Error details:', error.toJSON());
+    } else {
+      console.error('Unexpected error updating prospect:', error);
+    }
+    throw error;
+  }
+}

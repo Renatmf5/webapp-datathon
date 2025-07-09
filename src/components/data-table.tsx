@@ -1,16 +1,31 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
+import * as React from "react"
 import {
   ColumnDef,
+  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
   useReactTable,
+  VisibilityState,
 } from "@tanstack/react-table"
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
 
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -20,138 +35,150 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { useState, useEffect } from "react"
-import { fetchCarteirasFactor } from "@/../services/api"
-import { Button } from "@/components/ui/button"
+import { ProspectsGroup } from '@/types/prospects'
+import { useRouter } from 'next/navigation'
 
-export default function TradingTable() {
-  const [data, setData] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+// Componente para ação
+const ActionDropdown = ({ group }: { group: ProspectsGroup }) => {
+  const router = useRouter()
 
-  // Definição das colunas
-  const columns: ColumnDef<any, any>[] = [
-    {
-      accessorKey: "carteira",
-      header: "Carteira",
+  const handleViewDetails = () => {
+    localStorage.setItem("groupDetails", JSON.stringify(group))
+    router.push(`/dashboard/prospects/${group.codigo_vaga}`)
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuItem onClick={handleViewDetails}>
+          Ver detalhes dos prospects
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => router.push(`/dashboard/vagas/${group.codigo_vaga}`)}>
+          Ver detalhes da vaga
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+export const columns: ColumnDef<ProspectsGroup>[] = [
+  {
+    accessorKey: "codigo_vaga",
+    header: "Código Vaga",
+    cell: ({ row }) => <div className="truncate">{row.getValue("codigo_vaga")}</div>,
+  },
+  {
+    accessorKey: "titulo_vaga",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Título Vaga
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => (
+      <div className="truncate">{row.getValue("titulo_vaga")}</div>
+    ),
+  },
+  {
+    accessorKey: "modalidade",
+    header: "Modalidade",
+    cell: ({ row }) => <div className="truncate">{row.getValue("modalidade")}</div>,
+  },
+  {
+    id: "prospects",
+    header: "Prospects",
+    cell: ({ row }) => (
+      <div className="truncate">{row.original.prospects ? row.original.prospects.length : 0}</div>
+    ),
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const group = row.original
+      return <ActionDropdown group={group} />
     },
-    {
-      accessorKey: "data_posicao",
-      header: "Data Posição",
-    },
-    {
-      accessorKey: "valor_atualizado",
-      header: "Valor Atualizado",
-      cell: ({ getValue }) => {
-        const value = parseFloat(getValue() as string).toFixed(2);
-        return <span className="text-black">{value}</span>;
-      },
-    },
-    {
-      accessorKey: "acoes",
-      header: "Ações (Peso)",
-      cell: ({ getValue }) => {
-        const value = getValue() as string;
-        return <span className="text-black">{value}</span>;
-      },
-    },
-  ];
+  },
+]
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const cacheKey = "tradingDataCache";
-        const cacheTimestampKey = "tradingDataCacheTimestamp";
+interface DataTableDemoProps {
+  data: ProspectsGroup[]
+}
 
-        // Verifica se os dados estão no cache e se ainda são válidos
-        const cachedData = localStorage.getItem(cacheKey);
-        const cachedTimestamp = localStorage.getItem(cacheTimestampKey);
-
-        if (cachedData && cachedTimestamp) {
-          const now = Date.now();
-          const cacheAge = now - parseInt(cachedTimestamp, 10);
-
-          // Verifica se o cache tem menos de 1 hora (3600000 ms)
-          if (cacheAge < 3600000) {
-            console.log("Using cached data");
-            const parsedData = JSON.parse(cachedData);
-            setData(parsedData);
-            setIsLoading(false);
-            return;
-          } else {
-            console.log("Cache expired, fetching new data");
-            localStorage.removeItem(cacheKey);
-            localStorage.removeItem(cacheTimestampKey);
-          }
-        }
-
-        // Caso não tenha cache ou esteja expirado, faz a requisição
-        const tradingData = await fetchCarteirasFactor();
-        console.log("Fetched trading data:", tradingData);
-
-        // Verifica se tradingData é um array válido
-        if (!Array.isArray(tradingData)) {
-          console.error("Invalid trading data format:", tradingData);
-          setData([]);
-          return;
-        }
-
-        // Transformar o JSON em um array de objetos para a tabela
-        const transformedData = tradingData.flatMap((item) =>
-          Object.entries(item).map(([carteira, valores]: any) => ({
-            carteira,
-            data_posicao: valores.data_posicao,
-            valor_atualizado: valores.valor_atualizado,
-            acoes: Object.entries(valores.acoes || {})
-              .map(
-                ([acao, detalhes]: any) =>
-                  `${acao} (${(detalhes.peso * 100).toFixed(2)}%)`
-              )
-              .join(", "),
-          }))
-        );
-
-        // Salva os dados no cache (localStorage) com o timestamp atual
-        localStorage.setItem(cacheKey, JSON.stringify(transformedData));
-        localStorage.setItem(cacheTimestampKey, Date.now().toString());
-
-        setData(transformedData);
-      } catch (error) {
-        console.error("Error fetching trading data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+export function DataTableDemo({ data }: DataTableDemoProps) {
+  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
 
   const table = useReactTable({
     data,
     columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(), // caso use paginação interna
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      sorting: [{ id: "data_posicao", desc: true }], // Ordena da mais recente para a mais antiga
-      pagination: { pageSize: 10 }, // Define o tamanho da página como 10
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
     },
-  });
+  })
 
   return (
-    <div>
+    <div className="w-full">
+      <div className="flex items-center py-2">
+        <Input
+          placeholder="Filtrar por título..."
+          value={(table.getColumn("titulo_vaga")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("titulo_vaga")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm py-1"
+        />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto py-1">
+              Colunas <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table.getAllColumns().filter(column => column.getCanHide()).map(column => (
+              <DropdownMenuCheckboxItem
+                key={column.id}
+                className="capitalize"
+                checked={column.getIsVisible()}
+                onCheckedChange={(value) => column.toggleVisibility(!!value)}
+              >
+                {column.id}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+            {table.getHeaderGroups().map(headerGroup => (
+              <TableRow key={headerGroup.id} className="h-8">
+                {headerGroup.headers.map(header => (
+                  <TableHead key={header.id} className="py-1 px-2">
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
@@ -159,34 +186,35 @@ export default function TradingTable() {
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+              table.getRowModel().rows.map(row => (
+                <TableRow key={row.id} className="h-8">
+                  {row.getVisibleCells().map(cell => (
+                    <TableCell key={cell.id} className="py-1 px-2">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+              <TableRow className="h-8">
+                <TableCell colSpan={columns.length} className="h-8 text-center">
+                  Nenhum resultado.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between py-4">
-        <div className="flex items-center gap-2">
+      {/* Mantenha a paginação interna do data-table, se desejado */}
+      <div className="flex items-center justify-end space-x-2 py-2">
+        <div className="space-x-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Previous
+            Anterior
           </Button>
           <Button
             variant="outline"
@@ -194,29 +222,10 @@ export default function TradingTable() {
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Next
+            Próxima
           </Button>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm">
-            Página {table.getState().pagination.pageIndex + 1} de{" "}
-            {table.getPageCount()}
-          </span>
-          <select
-            className="border rounded p-1 text-sm"
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => {
-              table.setPageSize(Number(e.target.value));
-            }}
-          >
-            {[5, 10, 20].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>
-                Mostrar {pageSize}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
     </div>
-  );
+  )
 }

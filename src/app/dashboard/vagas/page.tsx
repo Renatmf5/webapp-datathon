@@ -2,7 +2,7 @@
 import { useEffect, useState, useReducer } from 'react';
 import { Button } from '@/components/ui/button';
 import VagaCard from '@/components/vaga-card';
-import { fetchDataVagas } from '../../../../services/api';
+import { fetchDataVagas } from '../../../services/api';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';

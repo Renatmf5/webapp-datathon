@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import VagaDetalhes from '@/components/vaga-detalhes';
 import { VagaDetails } from '@/types/vagas';
-import { fetchDataVagasById } from '../../../../../services/api';
+import { fetchDataVagasById } from '../../../../services/api';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
