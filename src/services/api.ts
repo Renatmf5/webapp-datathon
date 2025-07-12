@@ -3,6 +3,7 @@ import { CandidateDataMatching } from '@/types/candidates';
 import { VagaDetails } from '@/types/vagas';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.grupo-ever-rmf.com/api/v1/';
+//const API_BASE_URL = 'http://localhost:8000/api/v1/';
 
 console.log('NEXT_PUBLIC_API_BASE_URL:', API_BASE_URL);
 const api = axios.create({
@@ -213,3 +214,19 @@ export const atualizaProspect = async (prospectData: unknown) => {
     throw error;
   }
 }
+
+export const buscaDriftReport = async () => {
+  try {
+    const response = await api.get('inferencias/driftReport');
+    console.log('buscaDriftReport API Response:', response);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error fetching drift report:', error.message);
+      console.error('Error details:', error.toJSON());
+    } else {
+      console.error('Unexpected error fetching drift report:', error);
+    }
+    throw error;
+  }
+};

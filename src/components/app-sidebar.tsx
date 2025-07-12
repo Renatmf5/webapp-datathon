@@ -86,8 +86,8 @@ const data = {
           url: "/documentation/introduction",
         },
         {
-          title: "Models",
-          url: "#",
+          title: "Models Report",
+          url: "/documentation/model-report",
         },
       ],
     },
